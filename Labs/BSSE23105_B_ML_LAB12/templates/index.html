@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Prediction</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0f0a, #0d1f0d, #1a2e1a);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e0e0e0;
+        }
+
+        .container {
+            background: rgba(0,255,100, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,255,100, 0.15);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,255,100,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #39ff14, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sub { text-align:center; font-size:0.9rem; color:#6b9b6b; margin-bottom:30px; }
+
+        .grp { margin-bottom: 18px; }
+
+        label { display:block; font-size:0.85rem; font-weight:600; color:#39ff14; margin-bottom:6px; }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(0,255,100,0.2);
+            border-radius: 10px;
+            background: rgba(0,255,100,0.06);
+            color: #f3f4f6;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #39ff14;
+            box-shadow: 0 0 0 3px rgba(57,255,20,0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00cc44, #39ff14);
+            color: #0a0f0a;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(57,255,20,0.4); }
+
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            background: rgba(57,255,20,0.1);
+            border: 1px solid rgba(57,255,20,0.3);
+        }
+
+        .result.err { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); }
+        .result .lbl { font-size:0.85rem; color:#6b9b6b; margin-bottom:6px; }
+        .result .val { font-size:2rem; font-weight:700; color:#39ff14; }
+        .result.err .val { font-size:1rem; color:#ef4444; }
+        .ft { text-align:center; margin-top:24px; font-size:0.75rem; color:#6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ML Prediction</h1>
+        <p class="sub">Lab 12 - Flask Model Deployment</p>
+
+        <form method="POST" action="/predict">
+            <div class="grp">
+                <label>Age</label>
+                <input type="number" name="age" step="any" placeholder="e.g. 35" required>
+            </div>
+            <div class="grp">
+                <label>Income</label>
+                <input type="number" name="income" step="any" placeholder="e.g. 55000" required>
+            </div>
+            <div class="grp">
+                <label>Hour</label>
+                <input type="number" name="hour" step="any" placeholder="e.g. 14" required>
+            </div>
+            <div class="grp">
+                <label>Leak Feature</label>
+                <input type="number" name="leak_feature" step="any" placeholder="e.g. 0.72" required>
+            </div>
+            <button type="submit" class="btn">Get Prediction</button>
+        </form>
+
+        {% if prediction is not none and prediction is defined %}
+        <div class="result">
+            <div class="lbl">Prediction Result</div>
+            <div class="val">{{ prediction }}</div>
+        </div>
+        {% endif %}
+
+        {% if error is defined and error %}
+        <div class="result err">
+            <div class="lbl">Error</div>
+            <div class="val">{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <div class="ft">Flask &bull; scikit-learn &bull; Lab 12</div>
+    </div>
+</body>
+</html>

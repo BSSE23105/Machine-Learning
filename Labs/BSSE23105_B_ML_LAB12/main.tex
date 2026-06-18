@@ -1,0 +1,821 @@
+\documentclass[12pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{makecell}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{mathptmx}  % Times New Roman font
+\usepackage{needspace} % Keep headings with code
+
+% Allow tcolorboxes to break across pages
+\tcbuselibrary{breakable}
+\tcbset{breakable}
+
+\definecolor{headerblue}{RGB}{213,220,228}
+\definecolor{codebg}{RGB}{30,30,30}
+\definecolor{codetext}{RGB}{212,212,212}
+\definecolor{codekw}{RGB}{86,156,214}
+\definecolor{codestr}{RGB}{206,145,120}
+\definecolor{codecomment}{RGB}{106,153,85}
+\definecolor{codelightbg}{RGB}{245,245,245}
+
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{SE: Machine Learning Lab}
+\lhead{Lab 12}
+\rfoot{\thepage}
+
+% Clean code listing style
+\lstset{
+  backgroundcolor=\color{codelightbg},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries\color{codekw},
+  stringstyle=\color{codestr},
+  commentstyle=\itshape\color{codecomment},
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray!40},
+  numbers=none,
+  tabsize=4,
+  showstringspaces=false,
+  xleftmargin=8pt,
+  xrightmargin=8pt,
+  framesep=6pt,
+  aboveskip=8pt,
+  belowskip=8pt
+}
+
+\begin{document}
+
+% ============================================================
+% HEADER
+% ============================================================
+\renewcommand{\arraystretch}{2.0}
+\begin{tabularx}{\textwidth}{|Y|}
+\hline
+\rowcolor{headerblue} \textbf{\large Department of Computer and Software Engineering} \\
+\hline
+\textbf{\large SE: Machine Learning} \\
+\hline
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{12pt}
+
+% ============================================================
+% COURSE INFO
+% ============================================================
+\renewcommand{\arraystretch}{2.0}
+\begin{tabularx}{\textwidth}{|L|L|}
+\hline
+\textbf{Course Instructor:} & \textbf{Date:} \\
+\hline
+\textbf{Day:} & \textbf{Semester:} \\
+\hline
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{12pt}
+
+% ============================================================
+% TITLE
+% ============================================================
+\begin{center}
+{\Large\bfseries Lab 12: Model Deployment using Flask \& Package Management}
+\end{center}
+
+\vspace{6pt}
+
+% ============================================================
+% META TABLE
+% ============================================================
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{|Y|c|c|c|c|}
+\hline
+\textbf{Lab Title} & \textbf{CLO} & \textbf{BT} & \textbf{PLO} & \textbf{Weightage} \\
+\hline
+\makecell{{\small Model Deployment using Flask} \\ {\small REST APIs, Docker \& uv}} & & & & \\
+\hline
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{6pt}
+
+% ============================================================
+% STUDENT TABLE
+% ============================================================
+\renewcommand{\arraystretch}{2.0}
+\begin{tabularx}{\textwidth}{|Y|Y|Y|Y|Y|}
+\hline
+\textbf{Name} & \textbf{Roll Number} & \textbf{Report /10} & \textbf{Viva /5} & \textbf{Total /15} \\
+\hline
+Muhammad Abdul Qadir & BSSE23105 & & & \\
+\hline
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+
+\vspace{12pt}
+
+\begin{flushright}
+Checked on: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\vspace{6pt}
+Signature: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+\end{flushright}
+
+\newpage
+
+% ============================================================
+% OBJECTIVES
+% ============================================================
+
+\section*{Objectives}
+
+\begin{itemize}
+\item Convert an existing API from FastAPI to Flask
+\item Understand differences between API frameworks
+\item Deploy a trained model through a web interface and containerize it
+\item Utilize \texttt{uv} to manage modern Python environments and resolve version conflicts
+\end{itemize}
+
+% ============================================================
+% PROBLEM STATEMENT
+% ============================================================
+
+\section*{Problem Statement}
+
+In the previous lab, you built a machine learning pipeline, tracked experiments using MLflow, serialized the trained model, and deployed it using a FastAPI-based REST API.
+
+In real-world systems, different frameworks may be used depending on project requirements. Flask is a lightweight and widely used framework for building simple web applications and APIs. Furthermore, managing dependencies for complex ML packages (like MediaPipe for computer vision) often leads to version conflicts on newer Python releases.
+
+In this lab, you will convert the FastAPI deployment into a Flask application. Following this, you will explore environment and version management using \texttt{uv} to resolve a simulated dependency conflict.
+
+You are required to demonstrate the working system through screenshots of:
+\begin{itemize}
+\item The running Flask application and web interfaces
+\item Terminal outputs demonstrating dependency errors and their resolution
+\end{itemize}
+
+% ============================================================
+% TASK 1
+% ============================================================
+
+\section*{Part A: Understanding Existing API}
+
+\begin{tcolorbox}
+\textbf{Task 1: Analyze FastAPI Implementation}
+
+Review your Lab 11 FastAPI code and identify:
+\begin{itemize}
+\item How the model is loaded
+\item How input is received
+\item How predictions are returned
+\end{itemize}
+
+\textbf{Answer:}
+
+\begin{itemize}
+\item \textbf{Model Loading:} When the app starts it checks if \texttt{model.joblib} exists, and if it does it loads it using \texttt{joblib.load()}. Otherwise the model is set to None so the app knows its not available.
+\item \textbf{Input:} The \texttt{/predict} route takes a POST request with JSON data. It expects a key called \texttt{"features"} with a list of four numbers like \texttt{[age, income, hour, leak\_feature]}.
+\item \textbf{Predictions:} Those features get put into a DataFrame and passed to \texttt{model.predict()}. The result (0 or 1) is sent back as a JSON response.
+\end{itemize}
+
+\needspace{6\baselineskip}
+\textbf{Relevant FastAPI code from Lab 11:}
+
+\begin{lstlisting}[language=Python]
+# model loading
+mdl = joblib.load("model.joblib")
+
+# predict endpoint
+@app.post("/predict")
+def predict(data: dict):
+    features = data["features"]
+    df = pd.DataFrame([features],
+        columns=["age","income","hour","leak_feature"])
+    result = mdl.predict(df)
+    return {"prediction": int(result[0])}
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 2
+% ============================================================
+
+\section*{Part B: Flask Setup}
+
+\begin{tcolorbox}
+\textbf{Task 2: Create Flask Application}
+
+Create a Flask application with:
+\begin{itemize}
+\item A home route (/)
+\item A prediction route (/predict)
+\end{itemize}
+
+\needspace{8\baselineskip}
+\textbf{Flask Application Code (\texttt{flask\_app.py}):}
+
+\begin{lstlisting}[language=Python]
+import os
+import joblib
+import pandas as pd
+from flask import Flask, request, render_template
+
+app =Flask(__name__)
+
+# load model
+if os.path.exists("model.joblib"):
+    mdl= joblib.load("model.joblib")
+    print("model loaded ok")
+else:
+    mdl =None
+    print("no model found")
+
+cols =["age", "income", "hour", "leak_feature"]
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    if mdl is None:
+        return render_template("index.html", error="model not loaded")
+
+    try:
+        vals =[
+            float(request.form["age"]),
+            float(request.form["income"]),
+            float(request.form["hour"]),
+            float(request.form["leak_feature"]),
+        ]
+
+        df = pd.DataFrame([vals], columns= cols)
+        result =mdl.predict(df)
+        out= int(result[0])
+        return render_template("index.html", prediction =out)
+
+    except Exception as e:
+        return render_template("index.html", error= str(e))
+
+if __name__ =="__main__":
+    app.run(host= "0.0.0.0", port=5000, debug=True)
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 3
+% ============================================================
+
+\section*{Part C: Model Integration}
+
+\begin{tcolorbox}
+\textbf{Task 3: Load and Use Model}
+
+Load the serialized model from Lab 11 and use it to make predictions.
+
+Ensure:
+\begin{itemize}
+\item Correct input format
+\item Proper handling of numerical features
+\end{itemize}
+
+\textbf{Answer:}
+
+The model gets loaded when the app starts using \texttt{joblib.load("model.joblib")} and stored in a variable called \texttt{mdl}. When someone submits the form, the four values (age, income, hour, leak\_feature) are taken from the form fields, converted to floats, and put into a list. This list is then turned into a DataFrame with the right column names so the model can understand it. After that \texttt{mdl.predict()} runs and gives back 0 or 1.
+
+\needspace{6\baselineskip}
+\textbf{Model loading and prediction code:}
+
+\begin{lstlisting}[language=Python]
+# load model at startup
+if os.path.exists("model.joblib"):
+    mdl= joblib.load("model.joblib")
+
+cols =["age", "income", "hour", "leak_feature"]
+
+# inside predict route
+vals =[
+    float(request.form["age"]),
+    float(request.form["income"]),
+    float(request.form["hour"]),
+    float(request.form["leak_feature"]),
+]
+df = pd.DataFrame([vals], columns= cols)
+result =mdl.predict(df)
+out= int(result[0])
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 4
+% ============================================================
+
+\section*{Part D: Web Interface}
+
+\begin{tcolorbox}
+\textbf{Task 4: Create Input Form}
+
+Create a simple HTML form to take input features from the user.
+
+Display prediction results on the webpage.
+
+\needspace{8\baselineskip}
+\textbf{HTML Form Code (\texttt{templates/index.html}):}
+
+The form has four input fields for the features and a submit button. It posts to \texttt{/predict} and uses Jinja2 templating to show the result below the form when a prediction comes back.
+
+\begin{lstlisting}[language=HTML]
+<!DOCTYPE html>
+<html>
+<head><title>ML Prediction</title></head>
+<body>
+  <h1>ML Prediction</h1>
+  <p>Lab 12 - Flask Model Deployment</p>
+  <form method="POST" action="/predict">
+    <label>Age</label>
+    <input type="number" name="age"
+      step="any" required><br><br>
+    <label>Income</label>
+    <input type="number" name="income"
+      step="any" required><br><br>
+    <label>Hour</label>
+    <input type="number" name="hour"
+      step="any" required><br><br>
+    <label>Leak Feature</label>
+    <input type="number" name="leak_feature"
+      step="any" required><br><br>
+    <button type="submit">Get Prediction</button>
+  </form>
+
+  {% if prediction is not none
+     and prediction is defined %}
+    <h2>Prediction: {{ prediction }}</h2>
+  {% endif %}
+</body>
+</html>
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 5
+% ============================================================
+
+\section*{Part E: Testing and Screenshots}
+
+\begin{tcolorbox}
+\textbf{Task 5: Demonstration}
+
+Run the Flask application and capture screenshots of:
+\begin{itemize}
+\item Running server (terminal)
+\item Input form in browser
+\item Prediction output
+\end{itemize}
+
+% --- SCREENSHOT: 1l.png ---
+% Take a screenshot of your terminal showing Flask running
+% (the output after running: python flask_app.py)
+\textbf{Screenshot -- Flask server running in terminal:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{1l.png}
+\end{center}
+
+% --- SCREENSHOT: 2l.png ---
+% Take a screenshot of the browser showing the input form
+% at http://127.0.0.1:5000/
+\textbf{Screenshot -- Input form in browser:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{2l.png}
+\end{center}
+
+% --- SCREENSHOT: 3l.png ---
+% Take a screenshot of the browser showing the prediction
+% result after submitting the form
+\textbf{Screenshot -- Prediction output:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{3l.png}
+\end{center}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 6
+% ============================================================
+
+\section*{Part F: Containerization using Docker}
+
+\begin{tcolorbox}
+\textbf{Task 6: Create Dockerfile}
+
+Create a Dockerfile for your Flask application.
+
+Ensure:
+\begin{itemize}
+\item Base image uses Python
+\item Application dependencies are installed
+\item Flask app runs on port 5000
+\end{itemize}
+
+\needspace{8\baselineskip}
+\textbf{Dockerfile:}
+
+\begin{lstlisting}
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY flask_app.py .
+COPY model.joblib .
+COPY templates/ templates/
+
+EXPOSE 5000
+
+CMD ["python", "flask_app.py"]
+\end{lstlisting}
+
+\needspace{6\baselineskip}
+\textbf{requirements.txt:}
+
+\begin{lstlisting}
+flask>=3.0
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.5
+joblib
+\end{lstlisting}
+
+\end{tcolorbox}
+
+\vspace{12pt}
+
+% ============================================================
+% TASK 7
+% ============================================================
+
+\begin{tcolorbox}
+\textbf{Task 7: Build and Run Docker Image}
+
+Build the Docker image and run it locally.
+
+Verify:
+\begin{itemize}
+\item Application runs inside container
+\item API is accessible via browser
+\end{itemize}
+
+\textbf{Commands used:}
+\begin{lstlisting}
+docker build -t ml-flask-app .
+docker run -p 5000:5000 ml-flask-app
+\end{lstlisting}
+
+\textbf{Screenshot Required:}
+\begin{itemize}
+\item Docker build output
+\item Running container and browser output
+\end{itemize}
+
+% --- SCREENSHOT: 4l.png ---
+% Take a screenshot of the terminal showing docker build output
+% (the output after running: docker build -t ml-flask-app .)
+\textbf{Screenshot -- Docker build output:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{4l.png}
+\end{center}
+
+% --- SCREENSHOT: 5l.png ---
+% Take a screenshot showing the running container + browser
+% output. You can show docker ps output in terminal and the
+% browser open at http://localhost:5000 side by side
+\textbf{Screenshot -- Running container and browser output:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{5l.png}
+\end{center}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 8
+% ============================================================
+
+\section*{Part G: AWS ECR (Elastic Container Registry)}
+
+\begin{tcolorbox}
+\textbf{Task 8: Create ECR Repository}
+
+Create a repository in AWS ECR.
+
+Login to ECR using AWS CLI and authenticate Docker.
+
+\textbf{Commands used:}
+\begin{lstlisting}
+aws ecr create-repository
+  --repository-name ml-flask-app
+  --region us-east-1
+
+aws ecr get-login-password --region us-east-1 |
+  docker login --username AWS
+  --password-stdin
+  864423586496.dkr.ecr.us-east-1.amazonaws.com
+\end{lstlisting}
+
+% --- SCREENSHOT: 6l.png ---
+% Take a screenshot of the terminal showing the ECR
+% repository creation output and docker login success
+\textbf{Screenshot -- ECR repository creation and Docker login:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{6l.png}
+\end{center}
+
+\end{tcolorbox}
+
+\vspace{12pt}
+
+% ============================================================
+% TASK 9
+% ============================================================
+
+\begin{tcolorbox}
+\textbf{Task 9: Push Docker Image to ECR}
+
+Tag and push your Docker image to ECR.
+
+\textbf{Commands used:}
+\begin{lstlisting}
+docker tag ml-flask-app:latest
+  864423586496.dkr.ecr.us-east-1.amazonaws.com/
+  ml-flask-app:latest
+
+docker push
+  864423586496.dkr.ecr.us-east-1.amazonaws.com/
+  ml-flask-app:latest
+\end{lstlisting}
+
+\textbf{Screenshot Required:}
+\begin{itemize}
+\item Successful image push
+\item ECR repository showing uploaded image
+\end{itemize}
+
+% --- SCREENSHOT: 7l.png ---
+% Take a screenshot of the terminal showing the
+% successful docker push output
+\textbf{Screenshot -- Successful image push:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{7l.png}
+\end{center}
+
+% --- SCREENSHOT: 8l.png ---
+% Take a screenshot of the AWS Console showing ECR
+% Repositories page with your ml-flask-app image listed
+\textbf{Screenshot -- ECR repository showing uploaded image:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{8l.png}
+\end{center}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 10
+% ============================================================
+
+\section*{Part H: Deployment using Elastic Beanstalk}
+
+\begin{tcolorbox}
+\textbf{Task 10: Launch Environment}
+
+Using AWS Console:
+
+\begin{itemize}
+\item Initialize Elastic Beanstalk application
+\item Configure environment (Docker platform)
+\item Deploy application using ECR image
+\end{itemize}
+
+\textbf{Dockerrun.aws.json:}
+
+A \texttt{Dockerrun.aws.json} file was created to tell Elastic Beanstalk to pull the Docker image from ECR. This file was zipped and uploaded during environment creation.
+
+\begin{lstlisting}
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "864423586496.dkr.ecr.us-east-1
+      .amazonaws.com/ml-flask-app:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    { "ContainerPort": 5000, "HostPort": 80 }
+  ]
+}
+\end{lstlisting}
+
+% --- SCREENSHOT: 9a.png ---
+% Save the "Configure environment" page as 9a.png
+\textbf{Screenshot -- EB environment configuration:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=0.7\textwidth]{9l-a.png}
+\end{center}
+
+% --- SCREENSHOT: 9b.png ---
+% Save the "Platform + Upload code" page as 9b.png
+\textbf{Screenshot -- Platform selection and code upload:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=0.7\textwidth]{9l-b.png}
+\end{center}
+
+% --- SCREENSHOT: 9c.png ---
+% Save the "Service access / IAM roles" page as 9c.png
+\textbf{Screenshot -- Service access configuration:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=0.7\textwidth]{9l-c.png}
+\end{center}
+
+% --- SCREENSHOT: 9l.png ---
+% Save the EB dashboard after deployment as 9l.png
+\textbf{Screenshot -- EB environment launched:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{9l.png}
+\end{center}
+
+\end{tcolorbox}
+
+\vspace{12pt}
+
+% ============================================================
+% TASK 11
+% ============================================================
+
+\begin{tcolorbox}
+\textbf{Task 11: Verify Deployment}
+
+Access the deployed application via public URL.
+
+Verify:
+\begin{itemize}
+\item Flask app is running
+\item Predictions are working
+\end{itemize}
+
+\textbf{Screenshot Required:}
+\begin{itemize}
+\item Elastic Beanstalk dashboard
+\item Live application URL in browser
+\item Prediction output
+\end{itemize}
+
+% --- SCREENSHOT: 10l.png ---
+% Take a screenshot of the Elastic Beanstalk dashboard
+% showing environment health (green = OK)
+\textbf{Screenshot -- Elastic Beanstalk dashboard:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{10l.png}
+\end{center}
+
+% --- SCREENSHOT: 11l.png ---
+% Take a screenshot of your browser showing the live
+% deployed app URL (the .elasticbeanstalk.com URL)
+\textbf{Screenshot -- Live application URL in browser:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{11l.png}
+\end{center}
+
+% --- SCREENSHOT: 12l.png ---
+% Take a screenshot showing a prediction result
+% on the deployed application
+\textbf{Screenshot -- Prediction output on deployed app:}
+\vspace{6pt}
+
+\begin{center}
+\includegraphics[width=\textwidth]{12l.png}
+\end{center}
+
+\end{tcolorbox}
+
+\vspace{24pt}
+
+% ============================================================
+% PART I - BONUS (SKIPPED)
+% ============================================================
+
+\section*{Part I: Modern Package Management with \texttt{uv} [Bonus]}
+
+This section is a bonus task and was not attempted.
+
+\vspace{24pt}
+
+% ============================================================
+% TASK 18 - REFLECTION
+% ============================================================
+
+\section*{Part J: Reflection}
+
+\begin{tcolorbox}
+\textbf{Task 18: Reflection Questions}
+
+Answer the following:
+
+\begin{itemize}
+
+\needspace{4\baselineskip}
+\item \textbf{What is the role of Docker in deployment?}
+
+Docker puts the app and all its dependencies into one container. This way the app works the same on any machine, whether its your laptop, a test server, or the cloud. It removes the ``works on my machine'' issue.
+
+\vspace{12pt}
+
+\needspace{4\baselineskip}
+\item \textbf{Why use ECR instead of storing images locally?}
+
+ECR stores Docker images on the cloud so anyone on the team can access them. It connects with other AWS services like Elastic Beanstalk and ECS. If you only store images locally, other people or servers cant use them.
+
+\vspace{12pt}
+
+\needspace{4\baselineskip}
+\item \textbf{What are the advantages of Elastic Beanstalk?}
+
+EB handles the server setup, scaling and monitoring for you. You just upload your code or Docker image and it takes care of the rest. You dont have to manually set up EC2 instances or load balancers.
+
+\vspace{12pt}
+
+\needspace{4\baselineskip}
+\item \textbf{How does a tool like \texttt{uv} prevent ``dependency hell'' when working on multiple ML projects with different Python version requirements?}
+
+\texttt{uv} keeps each project in its own isolated environment with its own lockfile. It can switch between different Python versions quickly and use environment markers to install packages only when the right Python version is being used. This way different projects dont mess up each others dependencies.
+
+\end{itemize}
+
+\end{tcolorbox}
+
+% ============================================================
+
+\end{document}
