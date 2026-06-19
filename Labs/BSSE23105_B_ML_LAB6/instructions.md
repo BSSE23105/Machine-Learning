@@ -9,7 +9,10 @@ Run tests for Lab 6 (KMeans)
 conda activate MLlabtestenv
 ```
 
-Note: If the `MLlabtestenv` environment is not already installed, follow the environment setup instructions in ../INSTRUCTIONS_for_students.md (GCR) before continuing.
+
+
+Note: If the `MLlabtestenv` environment is not already installed, 
+follow the environment setup instructions in ../INSTRUCTIONS_for_students.md (GCR) before continuing.
 
 3. Change directory to the lab folder that contains `lab6_test_kmeans.py`.
 
